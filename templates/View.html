@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block css %}
+    <link href="/static/css/plugins/mloading/jquery.mloading.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<div id="mode_load">
+<div class="row  border-bottom white-bg dashboard-header">
+                <div class="col-lg-12">
+
+                    <div class="pull-right">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-xs btn-white active viewdata-b" id="view-btn">访问数据</button>
+                                    <button type="button" class="btn btn-xs btn-white attack-b" id="attack-btn">攻击数据</button>
+                                    {% if user.cluster %}
+                                    <button type="button" class="btn btn-xs btn-white dropdown-toggle" data-toggle="dropdown" id="action_btn" value="{{ user.cluster[0].nid }}">
+                                        <span id="clu-name">{{ user.cluster[0].name }}</span>
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        {% for clu in user.cluster %}
+                                        <li><a class="a-clu" value="{{ clu.nid }}">{{ clu.name }}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% endif %}
+
+                                </div>
+                    </div>
+
+                </div>
+                <div class="col-lg-12">
+
+                    <div class="col-md-3">
+                        <h3 style="text-align: center">TOP 5 IP</h3>
+                        <ul class="stat-list" id="top_ips">
+                            </ul>
+                    </div>
+                    <div class="col-md-9">
+                            <div>
+                                <canvas id="lineChart" height="135"></canvas>
+                            </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+
+
+
+
+<div class="row">
+<div class="col-lg-12">
+     <div class="wrapper wrapper-content">
+          <div class="row">
+
+
+             <div class="col-lg-4">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>TOP 5 UA</h5>
+                        <div class="ibox-tools">
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div>
+                                <canvas id="pie_1" height="300"></canvas>
+                            </div>
+                    </div>
+                </div>
+             </div>
+
+
+
+
+              <div class="col-lg-4">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5 id="status-top">TOP 5 Status</h5>
+                        <div class="ibox-tools">
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div>
+                                <canvas id="pie_2" height="300"></canvas>
+                            </div>
+                    </div>
+                </div>
+             </div>
+
+
+
+
+
+              <div class="col-lg-4">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>TOP 5 Webs</h5>
+                        <div class="ibox-tools">
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div>
+                                <canvas id="pie_3" height="300"></canvas>
+                            </div>
+                    </div>
+                </div>
+             </div>
+
+
+
+          </div>
+</div>
+</div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+
+    <!-- ChartJS-->
+    <script src="/static/js/plugins/chartJs/Chart.min.js"></script>
+
+    <script src="/static/js/plugins/mloading/jquery.mloading.js"></script>
+
+    <script type="text/javascript" src="/static/js/View.js"></script>
+
+{% endblock %}

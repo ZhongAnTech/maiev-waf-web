@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+
+{% block css %}
+    <!-- DataTables -->
+    <link href="/static/css/plugins/dataTables/datatables.min.css" rel="stylesheet">
+    <link href="/static/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+
+{% endblock %}
+
+{% block body %}
+<!-- page heading and  breadcrumb-->
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>集群管理</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="/">Home</a>
+            </li>
+            <li class="active">
+                <strong>集群列表</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+<!-- end page heading and  breadcrumb-->
+<!-- page content -->
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+
+
+    <div class="col-lg-3 col-md-3 col-xm-6">
+        <div class="ibox float-e-margins animated fadeInRight">
+        <div class="ibox-title">
+        <h5><i class="fa fa-cube"></i> 添加新集群</h5>
+            <div>
+                <small class="pull-right label label-primary" onclick="clu_add()">添加 <i class="fa fa-cog"></i> </small>
+                           </div>
+        </div>
+        <div class="ibox-content ">
+        <ul class="todo-list m-t">
+        </ul>
+        </div>
+        </div>
+        </div>
+
+
+        {% for clu in cluster  %}
+
+        <div class="col-lg-3 col-md-3 col-xm-6">
+        <div class="ibox float-e-margins animated fadeInRight">
+        <div class="ibox-title">
+        <h5><i class="fa fa-cube"></i> {{ clu.name }} </h5>
+            <div>
+                <small class="pull-right label label-success" onclick="clu_reload_c('{{ clu.nid }}','{{ clu.name }}')">重载<i class="fa fa-star"></i> </small>
+                <small class="pull-right label label-primary" onclick="clu_add('{{ clu.nid }}')">配置 <i class="fa fa-cog"></i> </small>
+                <small class="pull-right label label-danger" onclick="clu_del_c('{{ clu.nid }}','{{ clu.name }}')">删除 <i class="fa fa-trash"></i> </small>
+            </div>
+        </div>
+        <div class="ibox-content ">
+        <ul class="todo-list m-t">
+            {% if  clu.ngxhost %}
+                {% for ngx in clu.ngxhost.split(',') %}
+                     <ul class="todo-list m-t">
+                     <li>
+                         <a class="text-success"><i class="fa fa-server"></i>{{ ngx }}</a>
+                     </li>
+                     </ul>
+                {% endfor %}
+            {% endif %}
+        </ul>
+        </div>
+        </div>
+        </div>
+
+
+
+         {% endfor %}
+
+    </div>
+</div>
+
+
+
+
+
+
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="edit_modal" tabindex="-1" role="dialog" aria-labelledby="clu_edit" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="clu_edit_title">配置集群</h4>
+			</div>
+
+			<div class="modal-body">
+                    <form method="POST" class="form-horizontal" id="clu_form">
+
+
+                    <div class="form-group" hidden="">
+                        <label class="col-lg-3 control-label">nid</label>
+                        <div class="col-lg-9">
+                            <input type="text" class="form-control" id="clu_nid" name="nid">
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">集群名</label>
+                        <div class="col-lg-9">
+                            <input type="text" class="form-control" id="clu_name" name="name" placeholder="">
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">集群标签</label>
+                        <div class="col-lg-9">
+                            <input type="text" class="form-control" id="clu_label" name="label" placeholder="">
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">SLB</label>
+                        <div class="col-lg-9">
+                            <input type="text" class="form-control" id="clu_cname" name="cname" placeholder="">
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">ES集群地址</label>
+                        <div class="col-lg-9">
+                            <textarea class="form-control border-left m-t" name="eshost" id="clu_eshost" placeholder="用逗号分隔,例如:1.1.1.1:9200,1.1.1.2:9300"></textarea>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">Nginx集群地址</label>
+                        <div class="col-lg-9">
+                            <textarea class="form-control border-left m-t" name="ngxhost" id="clu_ngxhost" placeholder="用逗号分隔,例如:1.1.1.1,1.1.1.2"></textarea>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">saltstack配置</label>
+                        <div class="col-lg-9">
+                            <div class="input-group m-b"><span class="input-group-addon">API地址</span><input type="text" placeholder="" name="salt_api" id="clu_salt_api" class="form-control"></div>
+                            <div class="input-group m-b"><span class="input-group-addon">Username</span><input type="text" placeholder="" name="salt_user" id="clu_salt_user" class="form-control"></div>
+                            <div class="input-group m-b"><span class="input-group-addon">Password</span><input type="password" placeholder="" name="salt_pass" id="clu_salt_pass" class="form-control"></div>
+                            <div class="input-group m-b"><span class="input-group-addon">eauth</span><input type="text" placeholder="" name="salt_eauth" id="clu_salt_eauth" class="form-control"></div>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">nginx配置</label>
+                        <div class="col-lg-9">
+                            <div class="input-group m-b"><span class="input-group-addon">Nginx路径</span><input type="text" placeholder="/alidata1/app/tengine/sbin/nginx" name="ngx_path" id="clu_ngx_path" class="form-control"></div>
+                            <div class="input-group m-b"><span class="input-group-addon">vhost文件目录</span><input type="text" placeholder="/alidata1/conf/tengine/vhost/" name="site_dir" id="clu_site_dir" class="form-control"></div>
+                            <div class="input-group m-b"><span class="input-group-addon">WAF文件路径</span><input type="text" placeholder="" name="waf_conf_path" id="clu_waf_conf_path" class="form-control"></div>
+                            <div class="input-group m-b"><span class="input-group-addon">SSL文件目录</span><input type="text" placeholder="/alidata1/conf/tengine/ssl/" name="ssl_dir" id="clu_ssl_dir" class="form-control"></div>
+                        </div>
+                    </div>
+
+
+
+                    </form>
+			</div>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" onclick="clu_sub()">保存</button>
+			</div>
+
+        </div>
+    </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="del_clu_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 class="modal-title">
+					删除
+				</h4>
+			</div>
+			<div class="modal-body">
+                <div hidden=""><input type="text" class="form-control" id="del_clu_nid" name="nid"></div>
+                <div>确认删除集群<strong id="del_clu_name"></strong></div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+				</button>
+				<button type="button" class="btn btn-danger" onclick="clu_del()">
+					确认
+				</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal -->
+</div>
+
+
+
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="reload_clu_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 class="modal-title">
+					重载
+				</h4>
+			</div>
+			<div class="modal-body">
+                <div hidden=""><input type="text" class="form-control" id="reload_clu_nid" name="nid"></div>
+                <div>确认重载集群<strong id="reload_clu_name"></strong></div>
+                Nginx Reload 结果将发往消息中心
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+				</button>
+				<button type="button" class="btn btn-primary" onclick="clu_reload()">
+					确认
+				</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal -->
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+    <script type="text/javascript" src="/static/js/plugins/dataTables/datatables.min.js"></script>
+    <script src="/static/js/plugins/iCheck/icheck.min.js"></script>
+    <script type="text/javascript" src="/static/js/Cluster.js"></script>
+
+{% endblock %}

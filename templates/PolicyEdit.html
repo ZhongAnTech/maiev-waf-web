@@ -1,0 +1,362 @@
+{% extends 'base.html' %}
+
+{% block css %}
+    <!-- DataTables -->
+    <link href="/static/css/plugins/dataTables/datatables.min.css" rel="stylesheet">
+    <link href="/static/css/plugins/multiple-select/multiple-select.min.css" rel="stylesheet">
+    <link href="/static/css/plugins/multiple-select/bootstrap-theme.css" rel="stylesheet">
+    <link href="/static/css/plugins/sortable/sortable.css" rel="stylesheet">
+    <link href="/static/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+    <!-- selectize -->
+    <link href="/static/css/plugins/selectize/selectize.bootstrap3.css" rel="stylesheet">
+
+{% endblock %}
+
+{% block body %}
+<!-- page heading and  breadcrumb-->
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>策略编辑</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="/">Home</a>
+            </li>
+            <li class="active">
+                    <strong id="policy">策略</strong>
+                </li>
+            <li class="active">
+                <strong id="policy_edit">策略编辑</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+<!-- end page heading and  breadcrumb-->
+<!-- page content -->
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>策略配置</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal" id="policy_form" data-toggle="validator">
+                        <input type="hidden"  name="uuid" id="uuid" value={{ uuid }} readonly >
+                        <div class="form-group" id="policy_name_div" >
+                            <label class="col-lg-2  col-md-2  control-label">策略名</label>
+                            <div class="col-lg-9 col-md-9 ">
+                                <input type="text" class="form-control" name="name" required id="name" value='' >
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-lg-2  col-md-2  control-label">类型</label>
+                            <div class="col-lg-9 col-md-9 ">
+                                <select  class="form-control " name="kind" required id="kind" >
+                                        <option value="base">基础策略</option>
+                                </select>
+                                <div class="help-block with-errors small">策略类型</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-lg-2 control-label">集群</label>
+                            <div class="col-lg-9 col-md-9 ">
+                                <select  class="form-control single_select" name="cluster" required id="cluster" >
+                                    {% for cluster in clusters %}
+                                        <option value="{{cluster['nid']}}">{{cluster['name']}}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="help-block with-errors small">选择策略对应集群</div>
+                            </div>
+                        </div>                           
+                        <div class="form-group">
+                            <label class="col-lg-2 control-label">默认动作</label>
+                            <div class="col-lg-9 col-md-9 ">
+                                <select  class="form-control " name="default_action" required id="default_action" >
+                                    <option>DENY</option>
+                                    <option>DROP</option>
+                                    <option>REDIRECT</option>
+                                    <option>ACCEPT</option>
+                                    <option>GSUB</option>
+                                </select>
+                                <div class="help-block with-errors small">选择默认的防御动作</div>
+                            </div>
+                        </div>
+                         <div class="form-group default-redirect-url ">
+                                <label class="col-sm-2 col-md-2  col-lg-2 control-label " for="default_redirect_url">重定向地址</label>
+                                <div class="col-sm-9 col-lg-9 col-md-9 ">
+                                    <input class="form-control" name="default_redirect_url"  id="default_redirect_url" required type="url" />
+                                    <div class="help-block with-errors small">重定向地址</div>
+                                </div>
+                        </div>
+                        <div class="form-group default-gsub ">
+                                <label class="col-sm-2 col-md-2  col-lg-2 control-label" for="default_gsub_match">查找内容</label>
+                                <div class="col-sm-9 col-lg-9 col-md-9 ">
+                                    <input class="form-control" name="default_gsub_match"  id="default_gsub_match" required />
+                                    <div class="help-block with-errors small">查找内容，支持正则</div>
+                                </div>
+                        </div>
+                        <div class="form-group default-gsub ">
+                                <label class="col-sm-2 col-md-2  col-lg-2 control-label" for="default_gsub_replace">替换内容</label>
+                                <div class="col-sm-9 col-lg-9 col-md-9">
+                                    <input class="form-control" name="default_gsub_replace"  id="default_gsub_replace" required />
+                                    <div class="help-block with-errors small">替换内容，参考lua gsub</div>
+                                </div>
+                        </div>
+                         <div class="form-group">
+                             <label class="col-sm-2 col-md-2  col-lg-2 control-label" >上传过滤设置</label>
+                             <div class="col-sm-9 col-lg-9 col-md-9">
+                                <div class="checkbox">
+                                    <input type="checkbox" checked id="upload_file_access" value="1" class="checkbox-primary"><label for="request_body_access" >过滤上传文件</label>
+                                </div>
+                             </div>
+                         </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 col-md-2  col-lg-2 control-label" >请求过滤设置</label>
+                            <div class="col-sm-2 col-md-2 col-lg-2 ">
+                                <div class="checkbox">
+                                    <input type="checkbox" checked id="request_body_access" value="1" class="checkbox-primary"><label for="request_body_access" >过滤请求体</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-md-4 col-lg-4 ">
+                                <div class="input-group">
+                                    <span class="input-group-addon">最大请求体</span>
+                                    <input type="number" class="form-control" id="request_body_limit" name="request_body_limit" min=0 max=1073741824 value=134217728 />
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-md-3 col-lg-3">
+                                <div class="input-group">
+                                    <span class="input-group-addon">最大非文件请求体</span>
+                                    <input type="number" class="form-control" id="request_body_nofile_limit" name="request_body_nofile_limit" value=1048576 min=0 max=134217728 />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                                <label class="col-sm-2 col-md-2  col-lg-2 control-label" >响应过滤设置</label>
+                                <div class="col-sm-2 col-md-2 col-lg-2 ">
+                                    <div class="checkbox" >
+                                        <input type="checkbox" checked id="response_body_access" value=1 class="checkbox-primary"><label for="response_body_access" >过滤响应体</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-md-4 col-lg-4 ">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">过滤响应体类型</span>
+                                        <input type="text"  class="form-control" id="response_body_mime_type" name="response_body_mime_type" value="text/plain,text/html,text/xml" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 col-md-2 col-lg-3">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">最大响应体</span>
+                                        <input type="number" class="form-control" id="response_body_limit" name="response_body_limit" value=10485760 min=0 max=134217728  />
+                                    </div>
+                                </div>
+                            </div>                        
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>请求阶段规则</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12">
+                            <select  class="form-control" style="width:100%;" placeholder="选择规则"  name="request_rules" multiple="multiple"  id="request_rules" >
+                            </select>
+                        </div>
+                        <div class="col-lg-12 col-md-12" style="min-height: 360px" >
+                            <br/>
+                            <p><small>可拖动下列规则，改变规则执行顺序，也可单独编辑单个规则的拦截动作</small></p>
+                            <ol id="request-rule-list" class="todo-list m-t small-list request-rule-list">
+                            </ol>  
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <h5>响应头阶段规则</h5>
+                            <div class="ibox-tools">
+                                <a class="collapse-link">
+                                    <i class="fa fa-chevron-up"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="ibox-content">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12">
+                                    <select  class="form-control" style="width:100%;" placeholder="选择规则"  name="response_header_rules" multiple="multiple"  id="response_header_rules" >
+                                    </select>
+                                </div>
+                                <div class="col-lg-12 col-md-12" style="min-height: 120px" >
+                                    <br/>
+                                    <p><small>可拖动下列规则，改变规则执行顺序，也可单独编辑单个规则的拦截动作</small></p>
+                                    <ol id="header-rule-list" class="todo-list m-t small-list header-rule-list">
+                                    </ol>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <h5>响应体阶段规则</h5>
+                            <div class="ibox-tools">
+                                <a class="collapse-link">
+                                    <i class="fa fa-chevron-up"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="ibox-content">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12">
+                                    <select  class="form-control" style="width:100%;" placeholder="选择规则"  name="response_rules" multiple="multiple"  id="response_rules" >
+                                    </select>
+                                </div>
+                                <div class="col-lg-12 col-md-12" style="min-height: 120px" >
+                                    <br/>
+                                    <p><small>可拖动下列规则，改变规则执行顺序，也可单独编辑单个规则的拦截动作</small></p>
+                                    <ol id="response-rule-list" class="todo-list m-t small-list response-rule-list">
+                                    </ol>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-offset-10  col-sm-offset-10  col-sm-1 col-md-1">
+            <button type="button" class="btn btn-default btn-block" >取消</button>
+        </div>
+        <div class="col-sm-1 col-md-1">
+            <button type="button" id="save_policy" class="btn btn-primary btn-block" >保存</button>
+        </div>
+        <div class="clearfix"></div>
+        <br/>
+    </div>
+
+
+</div>
+<!--end  page content -->
+    <div class="modal fade" id="notify_modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="#" method="get" id="w_rule_form_2" class="form-horizontal"  >
+                    <input type="hidden" id="w_rule_id_2" name="w_rule_id" value="" />
+                    <input type="hidden" id="w_op_2" name="w_op" value="" />
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title">通知</h4>
+                  </div>
+                  <div class="modal-body">
+                    <div class="alert alert-danger">
+                        <span id="notify_box">确认删除该规则?</span>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary">保存</button>
+                  </div>
+            </form>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+    <!-- rule_action_modal Modal-->
+    <div class="modal fade" id="rule_action_modal" tabindex="-2" role="dialog" aria-labelledby="编辑" aria-hidden="false"
+        style="margin-left: auto;margin-right: auto;max-width: 800px">
+        <form id="rule_action_edit" class="form-horizontal"  data-toggle="validator" >
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="rule_action_modal_title">编辑防御动作</h4>
+            </div>
+            <div class="modal-body" id="rule_action_modal_box" >
+               
+                    <input type="hidden"  id="rule_id" name="rule_id"   >
+                    <input type="hidden"  id="rule_stage" name="rule_stage" >
+                    <div class="form-group rule-name ">
+                        <label class="col-sm-2 col-md-2  col-lg-2 control-label " for="rule_name">规则名</label>
+                        <div class="col-sm-10 col-md-10  col-lg-10">
+                            <input class="form-control" name="rule_name" readonly  id="rule_name" required />
+                            <div class="help-block with-errors small"></div>
+                        </div>
+                </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 col-md-2  col-lg-2  control-label" for="rule_action">动作类型</label>
+                        <div class="col-sm-10 col-md-10  col-lg-10">
+                            <select  class="form-control " required  style="width:100%" name="rule_action" id="rule_action" >
+                            </select>
+                            <div class="help-block with-errors small">选择具体的防御动作</div>
+                        </div>
+                     </div>
+                     <div class="form-group redirect-url ">
+                        <label class="col-sm-2 col-md-2  col-lg-2  control-label " for="redirect_url">重定向地址</label>
+                        <div class="col-sm-10 col-md-10  col-lg-10">
+                            <input class="form-control" name="redirect_url"  id="redirect_url" required type="url" />
+                            <div class="help-block with-errors small">重定向地址</div>
+                        </div>
+                    </div>
+                    <div class="form-group gsub ">
+                            <label class="col-sm-2 col-md-2  col-lg-2 control-label " for="gsub_match">查找内容</label>
+                            <div class="col-sm-10 col-md-10  col-lg-10">
+                                <input class="form-control" name="gsub_match"  id="gsub_match" required />
+                                <div class="help-block with-errors small">查找内容，支持正则</div>
+                            </div>
+                    </div>
+                    <div class="form-group gsub ">
+                            <label class="col-sm-2 col-md-2  col-lg-2 control-label " for="gsub_replace">替换内容</label>
+                            <div class="col-sm-10 col-md-10  col-lg-10">
+                                <input class="form-control" name="gsub_replace"  id="gsub_replace" required />
+                                <div class="help-block with-errors small">替换内容，参考lua gsub</div>
+                            </div>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="save_rule_action" >确定</button>
+            </div>
+        </div>
+        </form>
+    </div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+    <script type="text/javascript" src="/static/js/plugins/dataTables/datatables.min.js"></script>
+
+    <!-- Multiple Select  -->
+    <script src="/static/js/plugins/multiple-select/multiple-select.min.js"></script>
+    <!-- Validator -->
+    <script src="/static/js/plugins/validator/validator.min.js"></script>
+    <script src="/static/js/plugins/sortable/jquery-sortable.min.js"></script>
+    <script type="text/javascript" src="/static/js/PolicyEdit.js"></script>
+    <!-- selectize -->
+    <script src="/static/js/plugins/selectize/selectize.min.js"></script>
+{% endblock %}

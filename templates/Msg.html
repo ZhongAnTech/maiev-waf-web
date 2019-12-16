@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block css %}
+    <!-- DataTables -->
+    <link href="/static/css/plugins/dataTables/datatables.min.css" rel="stylesheet">
+    <link href="/static/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+
+{% endblock %}
+
+{% block body %}
+<!-- page heading and  breadcrumb-->
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>消息中心</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="/">Home</a>
+            </li>
+            <li class="active">
+                <strong>消息列表</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+<!-- end page heading and  breadcrumb-->
+<!-- page content -->
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>消息列表</h5>
+                </div>
+                <div class="ibox-content">
+                    <table id="cert-table" class="table">
+                            <thead>
+                                <tr>
+                                    <th>类型</th>
+                                    <th>目标环境</th>
+                                    <th>内容</th>
+                                    <th>状态</th>
+                                    <th>时间</th>
+                                    <th>操作人</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="edit_modal" tabindex="-1" role="dialog" aria-labelledby="cert_edit" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="cert_edit_title">编辑证书</h4>
+			</div>
+
+			<div class="modal-body">
+                    <form method="POST" class="form-horizontal" id="cert_form">
+
+
+                    <div class="form-group" hidden="">
+                        <label class="col-lg-3 control-label">nid</label>
+                        <div class="col-lg-9">
+                            <input type="text" class="form-control" id="cert_nid" name="nid">
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">证书名</label>
+                        <div class="col-lg-9">
+                            <input type="text" class="form-control" id="cert_name" name="name" placeholder="" readonly>
+                        </div>
+                    </div>
+
+
+
+
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">证书</label>
+                        <div class="col-lg-9">
+                            <textarea class="form-control border-left m-t" placeholder="" name="cert" id="cert_cert"></textarea>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">私钥</label>
+                        <div class="col-lg-9">
+                            <textarea class="form-control border-left m-t" placeholder="" name="keys" id="cert_keys"></textarea>
+                        </div>
+                    </div>
+
+
+                    </form>
+			</div>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" onclick="cert_sub()">确认</button>
+			</div>
+
+        </div>
+    </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="del_cert_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 class="modal-title">
+					删除
+				</h4>
+			</div>
+			<div class="modal-body">
+                <div hidden=""><input type="text" class="form-control" id="del_cert_nid" name="nid"></div>
+                <div>确认删除证书<strong id="del_cert_name"></strong></div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+				</button>
+				<button type="button" class="btn btn-danger" onclick="del_cert_confirm()">
+					确认
+				</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal -->
+</div>
+
+
+
+{% endblock %}
+
+
+{% block scripts %}
+
+    <script type="text/javascript" src="/static/js/plugins/dataTables/datatables.min.js"></script>
+    <script src="/static/js/plugins/iCheck/icheck.min.js"></script>
+    <script type="text/javascript" src="/static/js/Msg.js"></script>
+
+{% endblock %}

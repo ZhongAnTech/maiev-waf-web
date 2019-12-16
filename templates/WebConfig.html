@@ -1,0 +1,608 @@
+{% extends 'base.html' %}
+
+{% block css %}
+    <!-- DataTables -->
+    <link href="/static/css/plugins/dataTables/datatables.min.css" rel="stylesheet">
+    <link href="/static/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+
+{% endblock %}
+
+{% block body %}
+<!-- page heading and  breadcrumb-->
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2 id="web-clu">网站管理</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="/">Home</a>
+            </li>
+            <li class="active">
+                <strong>网站列表</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+<!-- end page heading and  breadcrumb-->
+<!-- page content -->
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5></h5>
+                    <button class="btn btn-xs btn-primary" onclick="edit_web()"><i class="fa fa-plus"></i>添加网站</button>
+                </div>
+                <div class="ibox-content">
+                    <table id="web-table" class="table">
+                            <thead>
+                                <tr>
+                                    <th>域名</th>
+                                    <th>网络状态</th>
+                                    <th>协议状态</th>
+                                    <th>后端服务</th>
+                                    <th>防护设置</th>
+                                    <th>操作</th>
+                                    <th>启用状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--end  page content 编辑站modal-->
+<div class="modal fade" id="edit_modal" tabindex="-1" role="dialog" aria-labelledby="edit_modal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" id="edit-modal-title">编辑站点</h4>
+          </div>
+
+
+          <div class="modal-body">
+
+                <form method="POST" id="web_form" class="form-horizontal" onsubmit="return false;">
+
+                    <div class="form-group" hidden="">
+                        <label class="col-lg-2 control-label">nid</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control" id="web_nid" name="web_nid">
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">域名</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control" id="web_form_name" name="name" placeholder="输入站点域名,例如:a.b.com">
+
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">协议类型</label>
+                        <div class="col-lg-10">
+                            <div class="checkbox checkbox-inline">
+                                <input type="checkbox" id="web_form_http" name="http" value=1><label for="web_form_http">HTTP</label>
+                            </div>
+                            <div class="checkbox checkbox-inline">
+                                <input type="checkbox" id="web_form_https" name="https" value=1><label for="web_form_https">HTTPS</label>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div id="https_options" hidden="" value=0>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">证书</label>
+                        <div class="col-lg-10">
+                            <select class="form-control single_select"   name="cert_nid" id="web_form_cert">
+                                <option value=""></option>
+                            </select>
+                            <div class="help-block small"><a href="/Cert" target="_blank">编辑和查看证书</a></div>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">HTTPS强转</label>
+                        <div class="col-lg-10">
+                            <div class="switch">
+                                <div class="onoffswitch">
+                                    <input type="checkbox" class="onoffswitch-checkbox" name="https_trans" id="web_form_https_trans" value="1">
+                                    <label class="onoffswitch-label" for="web_form_https_trans">
+                                        <span class="onoffswitch-inner"></span>
+                                        <span class="onoffswitch-switch"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">后端服务</label>
+                        <div class="col-lg-10">
+
+                            <div>
+                                <div class="radio radio-inline">
+                                    <input class="conf_type" type="radio" id="web_form_pro" value="professional" name="conf_type">
+                                    <label for="inlineRadio1">标准配置</label>
+                                </div>
+                            </div>
+
+                            <div class="hr-line-dashed"></div>
+
+                            <div id="proxy_services" hidden="" style="height: 400px">
+                                <li  style="list-style-type:none"><button class="btn btn-xs btn-primary" onclick="web_edit_server()">添加</button></li>
+                                    <table id="server_table" class="table" style="width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th>路径匹配</th>
+                                                    <th>服务地址</th>
+                                                    <th>路径重写</th>
+                                                    <th>其他配置</th>
+                                                    <th>操作</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+
+                                    </table>
+
+                            </div>
+
+
+
+                            <div id="custom_conf" hidden="">
+                                <textarea class="form-control" placeholder="编辑Nginx配置文件，不支持中文！" name="conf_file" id="conf_file" style="height: 400px"></textarea>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">备注</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control" id="web_form_mark" name="mark" placeholder="请填写,域名责任人信息">
+
+                        </div>
+                    </div>
+
+
+
+                </form>
+
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default"  data-dismiss="modal" onclick="location.reload()">取消</button>
+            <button type="button" class="btn btn-primary" onclick="web_sub()">确认</button>
+          </div>
+
+    </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+
+
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="server_edit" tabindex="-1" role="dialog" aria-labelledby="server_edit" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true" onclick="server_cancel()">&times;</button>
+				<h4 class="modal-title" id="server_edit_name">添加服务</h4>
+			</div>
+
+			<div class="modal-body">
+                    <form method="POST" class="form-horizontal" id="server_form">
+
+
+                    <div class="form-group" hidden="">
+                        <label class="col-lg-3 control-label">nid</label>
+                        <div class="col-lg-9">
+                            <input type="text" class="form-control" id="nid" name="nid">
+                        </div>
+                    </div>
+
+                    <div class="form-group" hidden="">
+                        <label class="col-lg-3 control-label">status</label>
+                        <div class="col-lg-9">
+                            <input type="text" class="form-control" id="status" name="status">
+                        </div>
+                    </div>
+
+                    <div class="form-group" hidden="">
+                        <label class="col-lg-3 control-label">order</label>
+                        <div class="col-lg-9">
+                            <input type="text" class="form-control" id="order" name="order">
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">路径</label>
+                        <div class="col-lg-9">
+                            <input type="text" class="form-control" id="location_url" name="location_url" placeholder="输入URL匹配路径,例如/home,通用无需填写">
+                        </div>
+                    </div>
+
+
+
+
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">匹配模式</label>
+                        <div class="col-lg-9">
+                            <select  class="form-control single_select"   name="location_pattern" id="location_pattern" >
+                                <option value="/">通用"/"</option>
+                                <option value="=">精确匹配"="</option>
+                                <option value="^~">字符串开头"^~"</option>
+                                <option value="~">区分大小写"~"</option>
+                                <option value="~*">不区分大小"~*"</option>
+                            </select>
+                        </div>
+                    </div>
+
+
+
+{#                    <div class="form-group">#}
+{#                        <label class="col-lg-3 control-label">服务地址</label>#}
+{#                        <div class="col-lg-9">#}
+{#                            <textarea class="form-control border-left m-t" placeholder="服务器地址用','隔开,例如:10.253.1.1,a.b.com,10.253.1.2:8081" name="proxy_service" id="proxy_service"></textarea>#}
+{#                        </div>#}
+{#                    </div>#}
+
+
+                        <div class="form-group">
+                            <label class="col-lg-3 control-label" for="column">服务地址</label>
+                            <div class="col-lg-5">
+                                <input type="text" class="form-control" id="column" name="column" placeholder="服务地址">
+                            </div>
+
+                            <label class="col-lg-2 control-label" for="columnType">权重</label>
+                            <div class="col-lg-2">
+                                <input type="text" class="form-control" id="columnType" name="columnType" placeholder="1">
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="column_tags" >
+{#                            <label class="col-lg-3 control-label"></label>#}
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-lg-3 control-label"></label>
+                            <div class="col-lg-9">
+                                <a class="btn btn-primary " id="addFeild" >添加服务</a>
+                            </div>
+                        </div>
+
+{#                        <div class="form-group" id="column_tags" >#}
+{#                        </div>#}
+
+
+
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">Flag</label>
+                        <div class="col-lg-9">
+                            <select  class="form-control single_select"   name="rewrite_flag" required id="rewrite_flag" >
+                            <option value="nowrite">不启用rewrite</option>
+                            <option value="last">last</option>
+                            <option value="break">break</option>
+                            <option value="redirect">redirect</option>
+                            <option value="permanent">permanent</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">Matches</label>
+                        <div class="col-lg-9">
+                            <input type="text" class="form-control" required="required" id="rewrite_matches" name="rewrite_matches" placeholder="">
+
+                        </div>
+                    </div>
+
+
+
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">Pattern</label>
+                        <div class="col-lg-9">
+                            <input type="text" class="form-control" required="required" id="rewrite_pattern" name="rewrite_pattern" placeholder="">
+
+                        </div>
+                    </div>
+
+
+
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">HTTP回源</label>
+                        <div class="col-lg-9">
+                            <select  class="form-control single_select"   name="http_back" id="http_back" >
+                            <option value=1>启用</option>
+                            <option value=0>关闭</option>
+                            </select>
+
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">负载均衡算法</label>
+                        <div class="col-lg-9">
+                            <select  class="form-control single_select"   name="slb_alg" id="slb_alg" >
+                            <option value=0>轮询</option>
+                            <option value=1>IP hash</option>
+                            <option value=2>session sticky</option>
+                            </select>
+
+                        </div>
+                    </div>
+
+
+
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">websocket</label>
+                        <div class="col-lg-9">
+                            <select  class="form-control single_select" name="websocket" id="websocket" >
+                            <option value=0>关闭</option>
+                            <option value=1>启用</option>
+                            </select>
+
+                        </div>
+                    </div>
+
+                    </form>
+			</div>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal" onclick="server_cancel()">取消</button>
+				<button type="button" class="btn btn-primary" onclick="server_sub()">确认</button>
+			</div>
+
+        </div>
+    </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="del_web_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 class="modal-title">
+					删除
+				</h4>
+			</div>
+			<div class="modal-body">
+                <div hidden=""><input type="text" class="form-control" id="del_web_nid" name="nid"></div>
+                <div>确认删除站点<strong id="del_web_name"></strong></div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+				</button>
+				<button type="button" class="btn btn-danger" onclick="web_del_c()">
+					确认
+				</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal -->
+</div>
+
+
+
+
+
+<div class="modal fade" id="configure_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 class="modal-title">
+					配置站点: <strong id="configure_name"></strong>
+				</h4>
+			</div>
+			<div class="modal-body">
+                 <form method="POST" class="form-horizontal" id="configure_form">
+                <div hidden="">
+                    <input type="text" class="form-control" id="configure_nid" name="nid">
+                </div>
+
+
+                    <div class="contact-box">
+
+
+                        <div class="col-sm-5">
+                            <div class="text-center">
+                                <div><i class="fa fa-shield fa-2x"></i></div>
+                                 <strong>Web应用攻击防护</strong><br>
+                                <div class="m-t-xs font-noraml">防护SQL注入、XSS跨站等常见Web应用攻击、实时生效。</div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-7">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">状态:</label>
+                                <div class="col-sm-5">
+                                    <select  class="form-control single_select" name="defend_web" id="defend_web" >
+                                    <option value=-1>关闭</option>
+                                    <option value=1>防御</option>
+                                    <option value=0>监听</option>
+                                    </select>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">策略:</label>
+                                <div class="col-sm-5">
+                                    <select  class="form-control single_select" name="defend_web_policy" id="defend_web_policy" >
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="clearfix">
+                        </div>
+
+                    </div>
+
+                <div class="contact-box">
+
+                    <div class="col-sm-5">
+                        <div class="text-center">
+                                <div><i class="fa fa-cc fa-2x"></i></div>
+                                 <strong>CC安全防护</strong><br>
+                                <div class="m-t-xs font-noraml">秒级拦截机器恶意CC攻击。</div>
+                            </div>
+                    </div>
+
+
+                        <div class="col-sm-7">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">状态:</label>
+                                <div class="col-sm-5">
+                                    <select  class="form-control single_select" name="defend_cc" id="defend_cc" >
+                                    <option value=-1>关闭</option>
+                                    <option value=1>启用</option>
+                                    </select>
+                                </div>
+                            </div>
+
+
+
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">统计时间:</label>
+                                <div class="col-sm-5">
+                                    <input type="text" class="form-control" id="defend_cc_time" name="defend_cc_time" placeholder="">
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">请求阈值:</label>
+                                <div class="col-sm-5">
+                                    <input type="text" class="form-control" id="defend_cc_count" name="defend_cc_count" placeholder="">
+                                </div>
+                            </div>
+                        </div>
+
+
+                    <div class="clearfix">
+                    </div>
+
+                </div>
+
+                <div class="contact-box">
+
+                        <div class="col-sm-5">
+                            <div class="text-center">
+                                <div><i class="fa fa-eye-slash fa-2x"></i></div>
+                                 <strong>黑名单服务</strong><br>
+                                <div class="m-t-xs font-noraml">可以针对指定的国内省份或海外地区的来源IP进行一键黑名单封禁</div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-sm-7">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">状态:</label>
+                                <div class="col-sm-5">
+                                    <select  class="form-control single_select" name="defend_blacklist" id="defend_blacklist" >
+                                    <option value=-1>关闭</option>
+                                    <option value=1>启用</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="clearfix">
+                        </div>
+
+                    </div>
+
+
+
+                        </form>
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+				</button>
+				<button type="button" class="btn btn-primary" onclick="configure_web()">
+					确认
+				</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal -->
+</div>
+
+
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="web_status_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 class="modal-title">
+					改变状态
+				</h4>
+			</div>
+			<div class="modal-body">
+                <div hidden=""><input type="text" class="form-control" id="web_status_nid" name="nid"></div>
+                <div hidden=""><input type="text" class="form-control" id="web_status_status" name="status"></div>
+                <div><strong id="web_status_name"></strong></div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal" onclick="location.reload()">取消
+				</button>
+				<button type="button" class="btn btn-primary" onclick="web_status_confirm()">
+					确认
+				</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal -->
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+    <script type="text/javascript" src="/static/js/plugins/dataTables/datatables.min.js"></script>
+    <script src="/static/js/plugins/iCheck/icheck.min.js"></script>
+    <script type="text/javascript" src="/static/js/WebConfig.js"></script>
+
+{% endblock %}

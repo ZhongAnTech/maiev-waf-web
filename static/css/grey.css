@@ -1,0 +1,100 @@
+.waf-container {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  width: 400px;
+  margin-left: -200px;
+  margin-top: -109px;
+}
+.waf-status {
+  text-align: center;
+}
+.waf-slider {
+  width: 180px;
+  height: 40px;
+  color: #fff;
+  margin: auto;
+}
+.waf-tip {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(70, 70, 70, 1);
+  padding: 20px 0 20px 0;
+  text-align: center;
+}
+
+.waf-tip-success {
+  color: rgba(18, 194, 135, 1);
+}
+
+.waf-tip-success > img {
+  position: relative;
+  top: 3px;
+  margin-right: 10px;
+}
+
+.waf-footer {
+  margin-top: 84px;
+  text-align: center;
+}
+.waf-text-center {
+  text-align: center;
+}
+.waf-count-down {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(144, 144, 144, 1);
+  display: none;
+}
+.waf-textarea {
+  width: 400px;
+  height: 160px;
+  background: rgba(242, 242, 242, 1);
+  border: 1px solid #dadada;
+  resize: none;
+  outline: none;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.btn-primary {
+  width: 180px;
+  height: 40px;
+  background: rgba(18, 194, 134, 1);
+  border-radius: 4px;
+  color: #fff;
+  border: 0;
+  outline: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: rgba(18, 194, 134, 0.8);
+}
+
+/* reset */
+#slider .success {
+  color: #fff !important;
+}
+#za-idcontrol {
+  background: rgba(18, 194, 134, 1) !important;
+  border-radius: 4px;
+  padding-left: 0;
+  text-align: center;
+}
+
+#za-id-radar {
+  display: none !important;
+}
+#za-id-label {
+  padding: 0;
+}
+.ft_circle {
+  background: rgba(18, 194, 134, 1);
+}
+
+#pk_man use {
+  fill: rgba(18, 194, 134, 1);
+}

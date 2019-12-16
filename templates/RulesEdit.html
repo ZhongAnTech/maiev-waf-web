@@ -1,0 +1,318 @@
+{% extends 'base.html' %}
+
+{% block css %}
+    <!-- DataTables -->
+    <link href="/static/css/plugins/dataTables/datatables.min.css" rel="stylesheet">
+    <link href="/static/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+
+
+    <link href="/static/css/plugins/select2/select2.min.css" rel="stylesheet">
+    <!-- selectize -->
+    <link href="/static/css/plugins/selectize/selectize.bootstrap3.css" rel="stylesheet">
+
+
+{% endblock %}
+
+{% block body %}
+<!-- page heading and  breadcrumb-->
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>规则管理</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="/">Home</a>
+            </li>
+            <li class="active">
+                <strong id="rules_action">规则编辑</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+<!-- end page heading and  breadcrumb-->
+<!-- page content -->
+
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>基本信息</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal" id="rule_form" data-toggle="validator">
+                        <input type="hidden"  name="nid" id="nid" value={{ nid }} readonly >
+                        <input type="hidden"  name="id" id="f_id" value='' readonly >
+                        <div class="form-group" id="rule_id_div" hidden="">
+                            <label class="col-lg-2  col-md-2  control-label">规则ID</label>
+                            <div class="col-lg-10 col-md-10 ">
+                                <input type="text" class="form-control" name="f_rule_id" id="f_rule_id" value='' readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-lg-2  col-md-2  control-label">规则名</label>
+                            <div class="col-lg-10 col-md-10 ">
+                                <input type="text" class="form-control" required name="f_rule_name" id="f_rule_name" value="">
+                                <div class="help-block with-errors small">规则名称,建议英文</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-lg-2  col-md-2  control-label">阶段</label>
+                            <div class="col-lg-10 col-md-10 ">
+                                <select name="stage" class="form-control single_select" id="stage" >
+                                    <option value="request" >请求阶段</option>
+                                    <option value="response_header" >响应头阶段</option>
+                                    <option value="response" >响应体阶段</option>
+                                </select>
+                                <div class="help-block with-errors small">规则作用阶段</div>
+                            </div>
+                        </div>                        
+                        <div class="form-group">
+                            <label class="col-lg-2  col-md-2  control-label">规则描述</label>
+                            <div class="col-lg-10 col-md-10 ">
+                                <input type="text" class="form-control" required name="f_rule_desc" id="f_rule_desc" value="">
+                                <div class="help-block with-errors small">规则的详细描述</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-lg-2  col-md-2  control-label">TAGS</label>
+                            <div class="col-lg-10 col-md-10 ">
+                                <input type="text" class="form-control" required  pattern="^\w+(,\w+)*$" name="tags" id="tags" value="">
+                                <div class="help-block with-errors small">规则标签,英文逗号分隔</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-lg-2  col-md-2  control-label">风险</label>
+                            <div class="col-lg-10 col-md-10 ">
+                                <select name="risk_level" class="form-control single_select" id="risk_level" >
+                                    <option value=1 >LOW</option>
+                                    <option value=2 >MEDIUM</option>
+                                    <option value=3 >HIGH</option>
+                                </select>
+                                <div class="help-block with-errors small">攻击的风险</div>
+                            </div>
+                        </div>
+                        <div class="form-group" hidden="">
+                            <label class="col-lg-2 control-label">状态</label>
+                            <div class="col-lg-10">
+                                <div class="switch">
+                                    <div class="onoffswitch">
+                                        <input type="checkbox" checked class="onoffswitch-checkbox" name="f_rule_status" id="f_rule_status">
+                                        <label class="onoffswitch-label" for="f_rule_status">
+                                            <span class="onoffswitch-inner"></span>
+                                            <span class="onoffswitch-switch"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>过滤条件</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                        <row>
+                            <div class="col-lg-12 col-md-12">
+                                <button type="button" class="btn btn-primary btn-xs" data-dismiss="modal" id="add_filter" data-target="#filter_modal" ><i class="fa fa-plus"> 添加</i></button>
+                            </div>
+                            <div class="col-lg-12 col-md-12">
+                                  <table class="table table-hover datatable small"  id="filter_table">
+                                        <thead>
+                                            <tr>
+                                                <th>filter_id</th>
+                                                <th>items</th>
+                                                <th>transforms</th>
+                                                <th>operator</th>
+                                                <th>value</th>
+                                                <th>options</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                  </table>
+
+                            </div>
+                        </row>
+                        <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-offset-10  col-sm-offset-10  col-sm-1 col-md-1">
+            <button type="button" class="btn btn-default btn-block" >取消</button>
+        </div>
+        <div class="col-sm-1 col-md-1">
+            <button type="button" id="save_rule" class="btn btn-primary btn-block" >保存</button>
+        </div>
+        <div class="clearfix"></div>
+        <br/>
+    </div>
+
+
+</div>
+<!--end  page content -->
+    <div class="modal fade" id="notify_modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="#" method="get" id="w_rule_form_2" class="form-horizontal"  >
+                    <input type="hidden" id="w_rule_id_2" name="w_rule_id" value="" />
+                    <input type="hidden" id="w_op_2" name="w_op" value="" />
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title">通知</h4>
+                  </div>
+                  <div class="modal-body">
+                    <div class="alert alert-danger">
+                        <span id="notify_box">确认删除该规则?</span>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary">保存</button>
+                  </div>
+            </form>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+    <!-- filter Modal-->
+    <div class="modal fade" id="filter_modal" tabindex="-2" role="dialog" aria-labelledby="编辑" aria-hidden="false"
+        style="margin-left: auto;margin-right: auto;max-width: 800px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="filter_modal_title">添加条件</h4>
+            </div>
+            <div class="modal-body" id="filter_detail_box" style="">
+                <form id="filter_edit" class="form-horizontal"  data-toggle="validator" >
+                    <input type="hidden"  id="filter_id" name="filter_id" value="0" >
+                    <div class="form-group">
+                        <label class="col-sm-2 col-md-2  col-lg-2" for="items">字段</label>
+                        <div class="col-sm-10 col-md-10  col-lg-10">
+                            <select  class="form-control " required  style="width:100%"    name="items" id="items" >
+                            </select>
+                            <div class="help-block with-errors small">选择要检测的字段,可多选</div>
+                        </div>
+                     </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 col-md-2  col-lg-2" for="transforms" >解码器</label>
+                        <div class="col-sm-10 col-md-10  col-lg-10">
+                            <select  class="form-control transforms_select"   style="width:100%"  multiple="multiple"   name="transforms" id="transforms" >
+                                <option>compress_whitespace</option>
+                                <option>html_decode</option>
+                                <option>cmd_line</option>
+                                <option>sql_hex_decode</option>
+                                <option>uri_decode</option>
+                                <option>base64_decode</option>
+                                <option>base64_encode</option>
+                                <option>lowercase</option>
+                                <option>normalise_path</option>
+                                <option>normalize_path_win</option>
+                                <option>remove_comments</option>
+                                <option>remove_comments_char</option>
+                                <option>remove_whitespace</option>
+                                <option>trim</option>
+                                <option>trim_left</option>
+                                <option>trim_right</option>
+                                <option>length</option>
+                                <option>count</option>
+                                <option>base64_decode_ext</option>
+                                <option>hex_decode</option>
+                                <option>hex_encode</option>
+                                <option>utf8_to_unicode</option>
+                                <option>gbk_to_unicode</option>
+                            </select>
+                            <div class="help-block with-errors small">选择解码器,可多选</div>
+                        </div>
+                     </div>
+
+                    <div class="form-group" id="operator_box" >
+                        <label class="col-sm-2 col-md-2  col-lg-2"  for="operator">比较符</label>
+                        <div class="col-sm-10 col-md-10  col-lg-10">
+                            <select  class="form-control single_select"    name="operator" required id="operator" >
+                                <option value="EQL">EQL</option>
+                                <option value="NEQ">NEQ</option>
+                                <option value="GET">GET</option>
+                                <option value="GTE">GTE</option>
+                                <option value="LET">LET</option>
+                                <option value="LTE">LET</option>
+                                <option value="REG">REG</option>
+                                <option value="NRE">NRE</option>
+                                <option value="DID">DID</option>
+                                <option value="SQL">SQL</option>
+                                <option value="XSS">XSS</option>
+                                <option value="ANY">ANY</option>
+                                <option value="NAN">NAN</option>
+                                <option value="ANY">ANY</option>
+                                <option value="EXT">EXT</option>
+                                <option value="NEX">NEX</option>
+                                <option value="STW">STW</option>
+                                <option value="EDW">EDW</option>
+                                <option value="CDR">CDR</option>
+                                <option value="CTN">CTN</option>
+                                <option value="NCT">NCT</option>
+                            </select>
+                            <div class="help-block with-errors small">选择比较方式</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="value_box" >
+                        <label class="col-sm-2 col-md-2  col-lg-2"  for="value">比较值</label>
+                        <div class="col-sm-10 col-md-10  col-lg-10">
+                            <input class="form-control" name="value" required id="value" >
+                            <div class="help-block with-errors">输入比较值</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="save_filter"  >确定</button>
+            </div>
+        </div>
+
+            </div>
+
+
+
+{% endblock %}
+
+
+{% block scripts %}
+
+    <script type="text/javascript" src="/static/js/plugins/dataTables/datatables.min.js"></script>
+    <script type="text/javascript" src="/static/js/RulesEdit.js"></script>
+
+    <!-- Select2 -->
+    <script src="/static/js/plugins/select2/select2.full.min.js"></script>
+    <!-- selectize -->
+    <script src="/static/js/plugins/selectize/selectize.min.js"></script>
+
+    <!-- Validator -->
+    <script src="/static/js/plugins/validator/validator.min.js"></script>
+
+
+
+
+{% endblock %}

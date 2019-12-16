@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+
+{% block css %}
+    <!-- DataTables -->
+    <link href="/static/css/plugins/dataTables/datatables.min.css" rel="stylesheet">
+    <link href="/static/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+
+    <!-- selectize -->
+    <link href="/static/css/plugins/selectize/selectize.bootstrap3.css" rel="stylesheet">
+
+
+{% endblock %}
+
+{% block body %}
+<!-- page heading and  breadcrumb-->
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>白名单</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="/">Home</a>
+            </li>
+            <li class="active">
+                <strong>白名单列表</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+<!-- end page heading and  breadcrumb-->
+<!-- page content -->
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5></h5>
+                    <button class="btn btn-xs btn-primary" onclick="rule_edit()"><i class="fa fa-plus"></i>添加白名单</button>
+                </div>
+                <div class="ibox-content">
+                    <table id="whitelist_table" class="table">
+                            <thead>
+                                <tr>
+                                    <th>时间</th>
+                                    <th>描述</th>
+                                    <th>内容</th>
+                                    <th>站点</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="edit_modal">
+<div class="modal-dialog">
+<div class="modal-content">
+    <form action="#" method="get" id="w_rule_form_1" class="form-horizontal"  data-toggle="validator"  >
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" id="cert_edit_title">规则白名单</h4>
+          </div>
+          <div class="modal-body">
+
+                <div class="form-group" hidden="">
+                    <label class="col-lg-3 control-label">NID</label>
+                    <div class="col-lg-9">
+                        <input type="text" class="form-control" readonly id="nid" name="nid">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-3 control-label">白名单描述</label>
+                    <div class="col-lg-9">
+                        <input type="text" class="form-control" required="required" id="w_rule_desc" name="w_rule_desc">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-lg-3 control-label">URI</label>
+                    <div class="col-lg-9">
+                        <input type="text" class="form-control" required="required" id="w_url" name="w_url" placeholder="">
+                        <div class="help-block with-errors small">URL正则匹配规则</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-lg-3 control-label">IP</label>
+                    <div class="col-lg-9">
+                        <input type="text" class="form-control" id="w_ip" pattern="^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])(\/\d{1,2})?$" required="required" name="w_ip" placeholder="IP匹配规则">
+                        <div class="help-block with-errors small">IP地址或者IP加掩码</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-lg-3 control-label">HOST</label>
+                    <div class="col-lg-9">
+                        <input type="text" class="form-control" id="w_host"  required="required" name="w_host" placeholder="">
+                        <div class="help-block with-errors small">站点域名</div>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="col-lg-3 control-label">集群</label>
+                    <div class="col-lg-9">
+                        <select  class="form-control" name="site" required id="site" >
+                        </select>
+{#                        <div class="help-block with-errors small">选择集群</div>#}
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="col-lg-3 control-label">启用</label>
+                    <div class="col-lg-9">
+                        <div class="switch">
+                            <div class="onoffswitch">
+                                <input type="checkbox" checked class="onoffswitch-checkbox" name="w_rule_status" id="w_rule_status">
+                                <label class="onoffswitch-label" for="w_rule_status">
+                                    <span class="onoffswitch-inner"></span>
+                                    <span class="onoffswitch-switch"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="help-block with-errors small"></div>
+                    </div>
+                </div>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            <button type="button" class="btn btn-primary" onclick="save_rule()" >保存</button>
+          </div>
+    </form>
+</div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="notify_modal">
+<div class="modal-dialog">
+<div class="modal-content">
+    <form action="#" method="get" id="w_rule_form_2" class="form-horizontal" >
+            <input type="hidden" id="id_2" name="id" value="" />
+            <input type="hidden" id="w_op_2" name="w_op" value="update" />
+            <input type="hidden" id="w_rule_status_2" name="w_rule_status" value=1/>
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title">通知</h4>
+          </div>
+          <div class="modal-body">
+            <div class="alert alert-danger">
+                <span id="notify_box">确认删除该规则?</span>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            <button type="button" id="save_op" class="btn btn-primary">保存</button>
+          </div>
+    </form>
+</div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+{% endblock %}
+
+
+{% block scripts %}
+
+    <script type="text/javascript" src="/static/js/plugins/dataTables/datatables.min.js"></script>
+    <script src="/static/js/plugins/iCheck/icheck.min.js"></script>
+    <script type="text/javascript" src="/static/js/Whitelist.js"></script>
+    <!-- selectize -->
+    <script src="/static/js/plugins/selectize/selectize.min.js"></script>
+
+
+{% endblock %}
