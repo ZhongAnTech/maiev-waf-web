@@ -6,7 +6,7 @@ dnspython==1.16.0
 elasticsearch==6.3.1
 enum34==1.1.6
 Flask==1.0.2
-Flask-Cors==3.0.7
+Flask-Cors==3.0.9
 Flask-MySQLdb==0.2.0
 Flask-Script==2.0.6
 Flask-SQLAlchemy==2.3.2
